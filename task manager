@@ -1,0 +1,156 @@
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+
+public class Main {
+    private static final Scanner read = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        TaskManagement taskManager = new TaskManagement();
+        int choice;
+        // Menu
+        do {
+            System.out.println("------------------");
+            System.out.println("Menu: ");
+            System.out.println("1. TO DO");
+            System.out.println("2. Generate a report");
+            System.out.println("3. Add Task");
+            System.out.println("4. Remove Task");
+            System.out.println("5. Mark as completed");
+            System.out.println("0. Exit");
+            System.out.println();
+            System.out.println("What do you want to do: ");
+            choice = getIntInput();
+            read.nextLine();
+            switch (choice) {
+                case 1:
+                    taskManager.displayTasks();
+                    System.out.println();
+                    break;
+                case 2:
+                    taskManager.generateReport();
+                    System.out.println();
+                    break;
+                case 3:
+                    System.out.println();
+                    System.out.println("Enter Task Name: ");
+                    String chosenName = getStringInput();
+                    System.out.println("Enter Task Description: ");
+                    String chosenDescription = getStringInput();
+                    System.out.println("Enter How many days until deadline: ");
+                    int chosenDue = getIntInput();
+                    System.out.println("Enter Priority (1-5, 1 being the most urgent): ");
+                    int chosenPriority = getIntInput();
+                    taskManager.AddTask(new Task(chosenName, chosenDescription, chosenDue, chosenPriority, false));
+                    System.out.println();
+                    break;
+                case 4:
+                    System.out.println("Enter the Name of the task to delete:");
+                    String nameToDelete = getStringInput();
+                    taskManager.deleteTask(nameToDelete);
+                    System.out.println();
+                    break;
+                case 5:
+                    // call method for mark as completed
+                    System.out.println("Enter the Name of the task to update:");
+                    String nameToUpdate = getStringInput();
+                    taskManager.markAsCompleted(nameToUpdate);
+                    System.out.println();
+                    break;
+                default:
+                    break;
+            }
+        } while (choice != 0); // end of menu, repeat menu while exit is not chosen
+
+        read.close();
+    }
+
+    private static int getIntInput() {
+        while (true) {
+            try {
+                return read.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number.");
+                read.next(); // Consumes the invalid input
+            }
+        }
+    }
+
+    private static String getStringInput() {
+        return read.nextLine();
+    }
+}
+
+class Task {
+    private String taskName;
+    private String description;
+    private int dueDate;
+    private int priority;
+    private boolean completed;
+
+    public Task(String taskName, String description, int dueDate, int priority, boolean completed) {
+        this.taskName = taskName;
+        this.description = description;
+        this.dueDate = dueDate;
+        this.priority = priority;
+        this.completed = completed;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted() {
+        this.completed = true;
+    }
+
+    public void displayDetails() {
+        System.out.println("-------------");
+        System.out.println("Task Name: " + taskName);
+        System.out.println("Description: " + description);
+        System.out.println("Due Date: " + dueDate + " days left.");
+        System.out.println("Priority: " + priority);
+        System.out.println("Completed: " + completed);
+    }
+}
+
+class TaskManagement {
+    private ArrayList<Task> tasks = new ArrayList<>();
+
+    public void AddTask(Task task) {
+        tasks.add(task);
+    }
+
+    public void deleteTask(String taskName) {
+        tasks.removeIf(t -> t.getTaskName().equalsIgnoreCase(taskName));
+    }
+
+    public void markAsCompleted(String taskName) {
+        for (Task task : tasks) {
+            if (task.getTaskName().equalsIgnoreCase(taskName)) {
+                task.setCompleted();
+            }
+        }
+    }
+
+    public void displayTasks() {
+        for (Task task : tasks) {
+            if (!task.getCompleted()) {
+                task.displayDetails();
+            }
+        }
+    }
+
+    public void generateReport() {
+        System.out.println("TASK REPORT: ");
+        for (Task task : tasks) {
+            if (task.getCompleted()) {
+                task.displayDetails();
+            }
+        }
+    }
+}
